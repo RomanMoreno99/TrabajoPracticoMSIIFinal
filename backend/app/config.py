@@ -6,8 +6,12 @@ class Settings(BaseSettings):
     db_user: str
     db_password: str
     db_host: str = "127.0.0.1"
-    db_port: int = 3306
+    db_port: int = 3300
     db_name: str = "ecommerce_db"
+
+    jwt_secret_key: str = "mi_clave_super_secreta_123456"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
 
     model_config = SettingsConfigDict(
         env_file=".env",

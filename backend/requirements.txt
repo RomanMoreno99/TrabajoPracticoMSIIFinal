@@ -1,5 +1,8 @@
 fastapi
 uvicorn[standard]
-sqlalchemy
+sqlalchemy[asyncio]
 asyncmy
 pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
