@@ -3,8 +3,8 @@ from sqlalchemy import URL
 
 
 class Settings(BaseSettings):
-    db_user: str
-    db_password: str
+    db_user: str = "admin@ecommerce.com"
+    db_password: str = "admin123"
     db_host: str = "127.0.0.1"
     db_port: int = 3300
     db_name: str = "ecommerce_db"

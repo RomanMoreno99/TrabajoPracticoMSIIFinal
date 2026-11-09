@@ -1,19 +1,42 @@
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import router as auth_router
-from app.crud import create_producto, delete_producto, get_producto_by_id, get_productos, update_producto
+from app.crud import (
+    create_producto,
+    delete_producto,
+    get_producto_by_id,
+    get_productos,
+    update_producto,
+)
 from app.database import get_db
 from app.models import Categoria, Producto, Usuario
-from app.schemas import CategoriaCreate, CategoriaOut, ProductoCreate, ProductoUpdate, ProductoOut
+from app.schemas import (
+    CategoriaCreate,
+    CategoriaOut,
+    ProductoCreate,
+    ProductoOut,
+    ProductoUpdate,
+)
 from app.security import get_current_user
 
 app = FastAPI(
     title="Ecommerce API",
     version="1.0.0",
     description="API de e-commerce con FastAPI + MySQL + JWT",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router)
