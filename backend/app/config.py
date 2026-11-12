@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     jwt_secret_key: str = "mi_clave_super_secreta_123456"
     jwt_algorithm: str = "HS256"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 1
 
     model_config = SettingsConfigDict(
         env_file=".env",
