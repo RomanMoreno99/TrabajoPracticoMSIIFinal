@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     db_port: int = 3300
     db_name: str = "ecommerce_db"
 
-    jwt_secret_key: str = "mi_clave_super_secreta_123456"
+    jwt_secret_key: str = "donde_esta_si_super_traje_26"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 1
 
