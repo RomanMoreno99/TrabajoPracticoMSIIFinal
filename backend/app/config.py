@@ -1,15 +1,16 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import SecretStr
 from sqlalchemy import URL
 
 
 class Settings(BaseSettings):
-    db_user: str = "admin@ecommerce.com"
-    db_password: str = "admin123"
+    db_user: str
+    db_password: SecretStr
     db_host: str = "127.0.0.1"
     db_port: int = 3300
-    db_name: str = "ecommerce_db"
+    db_name: str
 
-    jwt_secret_key: str = "donde_esta_si_super_traje_26"
+    jwt_secret_key: SecretStr
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 1
 
@@ -23,7 +24,7 @@ class Settings(BaseSettings):
         return URL.create(
             drivername="mysql+asyncmy",
             username=self.db_user,
-            password=self.db_password,
+            password=self.db_password.get_secret_value(),
             host=self.db_host,
             port=self.db_port,
             database=self.db_name,
