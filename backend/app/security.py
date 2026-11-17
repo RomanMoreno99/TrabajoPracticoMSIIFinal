@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta, timezone
+import base64
+import hashlib
+import hmac
+import secrets
 from typing import Optional
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,16 +16,34 @@ from app.database import SessionLocal
 from app.models import Usuario
 from app.schemas import TokenData
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        algorithm, iterations, salt, expected_hash = hashed_password.split("$", 3)
+        if algorithm != "pbkdf2_sha256":
+            return False
+        actual_hash = hashlib.pbkdf2_hmac(
+            "sha256",
+            plain_password.encode("utf-8"),
+            base64.urlsafe_b64decode(salt.encode("ascii")),
+            int(iterations),
+        )
+        expected = base64.urlsafe_b64decode(expected_hash.encode("ascii"))
+        return hmac.compare_digest(actual_hash, expected)
+    except (ValueError, TypeError):
+        return False
 
 
 def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
+    salt = secrets.token_bytes(16)
+    password_hash = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), salt, _PASSWORD_HASH_ITERATIONS
+    )
+    encoded_salt = base64.urlsafe_b64encode(salt).decode("ascii")
+    encoded_hash = base64.urlsafe_b64encode(password_hash).decode("ascii")
+    return f"pbkdf2_sha256${_PASSWORD_HASH_ITERATIONS}${encoded_salt}${encoded_hash}"
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
